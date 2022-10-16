@@ -13,11 +13,11 @@ stages:
       md5: c24bef906a454fb3986e43a6da9510d0
       size: 1528
     - path: src/data/make_dataset.py
-      md5: 12e8d2ead4dd960163983642455ab2c0
-      size: 1393
+      md5: 7f13ea634104d784feb9a2aa4ea075fd
+      size: 1205
     - path: src/data/preprocess.py
-      md5: ff632622b7d61d5074a2ed5ac50f74d2
-      size: 1764
+      md5: 364f2697d29ba1d8242267019e661036
+      size: 1475
     - path: src/utils.py
       md5: a63e9fc88f67423ded9b88dcd49a34f6
       size: 375
@@ -79,32 +79,26 @@ stages:
             preprocessed_target_data_pkl: data/preprocessed/target_data.pkl
             preprocessed_test_data_pkl: data/preprocessed/test_data.pkl
     outs:
-    - path: data/preprocessed/target_data.pkl
-      md5: 0b4cbec5ca168ffbbfa7399b28d9e2d9
-      size: 21128
     - path: data/preprocessed/test_data.pkl
       md5: edeefe115658b8aa683ee2acb4b82d2a
       size: 43142
     - path: data/preprocessed/train_data.pkl
-      md5: 6ca90dd6846e2d5c64980742742d1169
-      size: 61306
+      md5: 8e9f23906108618d7b9f95323ba6ae33
+      size: 99796
   generate_features:
     cmd: python -m src.features.build_features --config=params.yaml
     deps:
-    - path: data/preprocessed/target_data.pkl
-      md5: 0b4cbec5ca168ffbbfa7399b28d9e2d9
-      size: 21128
     - path: data/preprocessed/test_data.pkl
       md5: edeefe115658b8aa683ee2acb4b82d2a
       size: 43142
     - path: data/preprocessed/train_data.pkl
-      md5: 6ca90dd6846e2d5c64980742742d1169
-      size: 61306
+      md5: 8e9f23906108618d7b9f95323ba6ae33
+      size: 99796
     - path: src/config.py
       md5: c24bef906a454fb3986e43a6da9510d0
       size: 1528
     - path: src/features/build_features.py
-      md5: ce1e29916afdbf3144a9fb9cca680d3c
+      md5: f8000faf83f3a107d81755831f66ca66
       size: 1250
     - path: src/features/features.py
       md5: f9e49793825db16ccadb19e21d4c5ecb
@@ -125,8 +119,94 @@ stages:
             featurized_test_data_pkl: data/features/featurized_test_data_pkl
     outs:
     - path: data/features/featurized_test_data_pkl
-      md5: 52b8a9888e9f27b6b5be5327f66ca1e3
-      size: 71059
-    - path: data/features/featurized_train_data_pkl
       md5: d509399459aaa45f9a4759ce973ebe31
       size: 49432
+    - path: data/features/featurized_train_data_pkl
+      md5: 475cdf7e45285617f9822808b3aada03
+      size: 109574
+  train_catboost:
+    cmd: python -m src.models.catboost.train_model --config=params.yaml
+    deps:
+    - path: data/features/featurized_train_data_pkl
+      md5: 3ee7a6628f8a5885585f2260258a9951
+      size: 109589
+    - path: src/config.py
+      md5: e268bd72983d6bb674453b5da8ec849d
+      size: 2609
+    - path: src/models/catboost/train_model.py
+      md5: 2bcc35745207df6d3f57ad42f081271a
+      size: 2108
+    - path: src/models/utils.py
+      md5: 040d5f920076d2409a6ef5e92edb7104
+      size: 2944
+    params:
+      params.yaml:
+        train:
+          CAT_COLS:
+          - Пол
+          - Семья
+          - Этнос
+          - Национальность
+          - Религия
+          - Образование
+          - Профессия
+          - Статус Курения
+          - Частота пасс кур
+          - Алкоголь
+          - Жаворонок/Сова/Воробей
+          hyperopt:
+            best_model_file: models/hyperopt_best_model.joblib
+          catboost:
+            iterations: 5000
+            loss_function: MultiLogloss
+            eval_metric: MultiLogloss
+            learning_rate: 0.03
+            bootstrap_type: Bayesian
+            boost_from_average: false
+            ctr_leaf_count_limit: 1
+            leaf_estimation_iterations: 1
+            leaf_estimation_method: Gradient
+            catboost_best_model_path: models/catboost_best_model.joblib
+            catboost_metrics: reports/catboost_metrics.json
+            catboost_inference_predict: data/inference/catboost_predict.csv
+    outs:
+    - path: models/catboost_best_model.joblib
+      md5: 74385449f7019524424d17b7fe571bf1
+      size: 26753956
+  pred_eval_catboost:
+    cmd: python -m src.models.catboost.predict_model --config=params.yaml
+    deps:
+    - path: data/features/featurized_test_data_pkl
+      md5: fdf588f669a46f17dff05cf6eb7e9b1b
+      size: 49447
+    - path: data/features/featurized_train_data_pkl
+      md5: 3ee7a6628f8a5885585f2260258a9951
+      size: 109589
+    - path: models/catboost_best_model.joblib
+      md5: 74385449f7019524424d17b7fe571bf1
+      size: 26753956
+    - path: src/config.py
+      md5: c3d65e1a0611eba949bfbe80e79da87a
+      size: 2618
+    - path: src/models/catboost/predict_model.py
+      md5: 77d236713c86bc81449b3fabbf8e45be
+      size: 1514
+    - path: src/models/catboost/train_model.py
+      md5: 2bcc35745207df6d3f57ad42f081271a
+      size: 2108
+    - path: src/models/utils.py
+      md5: 040d5f920076d2409a6ef5e92edb7104
+      size: 2944
+    params:
+      params.yaml:
+        predict:
+          catboost:
+            metrics: reports/catboost_metrics.json
+            inference_predict: data/inference/catboost_predict.csv
+    outs:
+    - path: data/inference/catboost_predict.csv
+      md5: 7421c3263861950b2d318da764a3647e
+      size: 79750
+    - path: reports/catboost_metrics.json
+      md5: 49bb3b76e0d16cffa481828df9a60ba4
+      size: 275

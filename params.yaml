@@ -25,10 +25,34 @@ generate_features:
   cols:
     WAKE_UP_TIME_COL: 'Время пробуждения'
     FALL_ASLEEP_COL: 'Время засыпания'
-    SLEEP_BEHAVIORS_COL: 'Жаворонок/Сова'
+    SLEEP_BEHAVIORS_COL: 'Жаворонок/Сова/Воробей'
     SLEEP_DURATION_COL: 'Длительность сна (ч.)'
 
   paths:
     featurized_train_data_pkl: 'data/features/featurized_train_data_pkl'
     featurized_test_data_pkl: 'data/features/featurized_test_data_pkl'
 
+
+train:
+  CAT_COLS: [ 'Пол', 'Семья', 'Этнос', 'Национальность', 'Религия', 'Образование', 'Профессия', 'Статус Курения', 'Частота пасс кур', 'Алкоголь', 'Жаворонок/Сова/Воробей']
+
+  hyperopt:
+    best_model_file: 'models/hyperopt_best_model.joblib'
+
+  catboost:
+    iterations: 5000
+    loss_function: 'MultiLogloss'
+    eval_metric: 'MultiLogloss'
+    learning_rate: 0.03
+    bootstrap_type: 'Bayesian'
+    boost_from_average: False
+    ctr_leaf_count_limit: 1
+    leaf_estimation_iterations: 1
+    leaf_estimation_method: 'Gradient'
+    catboost_best_model_path: 'models/catboost_best_model.joblib'
+
+predict:
+
+    catboost:
+      metrics: 'reports/catboost_metrics.json'
+      inference_predict: 'data/inference/catboost_predict.csv'

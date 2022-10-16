@@ -55,13 +55,3 @@ def preprocess_data(df: pd.DataFrame) -> pd.DataFrame:
     df = cast_types(df)
 
     return df
-
-
-def preprocess_target(df: pd.DataFrame) -> pd.DataFrame:
-    df[TARGET_COLS] = df[TARGET_COLS].astype(np.int8)
-    return df
-
-
-def extract_target(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
-    df, target = df.drop(TARGET_COLS, axis=1), df[TARGET_COLS]
-    return df, target

@@ -12,13 +12,11 @@ stages:
     - load_data
     - preprocess_data
     outs:
-    - data/preprocessed/target_data.pkl
     - data/preprocessed/test_data.pkl
     - data/preprocessed/train_data.pkl
   generate_features:
     cmd: python -m src.features.build_features --config=params.yaml
     deps:
-    - data/preprocessed/target_data.pkl
     - data/preprocessed/test_data.pkl
     - data/preprocessed/train_data.pkl
     - src/config.py
@@ -30,3 +28,30 @@ stages:
     outs:
     - data/features/featurized_test_data_pkl
     - data/features/featurized_train_data_pkl
+  train_catboost:
+    cmd: python -m src.models.catboost.train_model --config=params.yaml
+    deps:
+    - data/features/featurized_train_data_pkl
+    - src/config.py
+    - src/models/catboost/train_model.py
+    - src/models/utils.py
+    params:
+    - train
+    outs:
+    - models/catboost_best_model.joblib
+  pred_eval_catboost:
+    cmd: python -m src.models.catboost.predict_model --config=params.yaml
+    deps:
+    - data/features/featurized_test_data_pkl
+    - data/features/featurized_train_data_pkl
+    - models/catboost_best_model.joblib
+    - src/config.py
+    - src/models/catboost/predict_model.py
+    - src/models/catboost/train_model.py
+    - src/models/utils.py
+    params:
+    - predict
+    outs:
+    - data/inference/catboost_predict.csv
+    metrics:
+    - reports/catboost_metrics.json

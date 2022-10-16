@@ -30,3 +30,29 @@ SLEEP_DURATION_COL = config['generate_features']['cols']['SLEEP_DURATION_COL']
 
 featurized_train_data_pkl = config['generate_features']['paths']['featurized_train_data_pkl']
 featurized_test_data_pkl = config['generate_features']['paths']['featurized_test_data_pkl']
+
+
+# Train
+TRAIN_CAT_COLS = config['train']['CAT_COLS']
+
+# Hyperopt
+hyperopt_best_model_file = config['train']['hyperopt']['best_model_file']
+
+
+# Catboost
+catboost_iterations = config['train']['catboost']['iterations']
+catboost_loss_function = config['train']['catboost']['loss_function']
+catboost_eval_metric = config['train']['catboost']['eval_metric']
+catboost_learning_rate = config['train']['catboost']['learning_rate']
+catboost_bootstrap_type = config['train']['catboost']['bootstrap_type']
+catboost_boost_from_average = config['train']['catboost']['boost_from_average']
+catboost_ctr_leaf_count_limit = config['train']['catboost']['ctr_leaf_count_limit']
+catboost_leaf_estimation_iterations = config['train']['catboost']['leaf_estimation_iterations']
+catboost_leaf_estimation_method = config['train']['catboost']['leaf_estimation_method']
+catboost_best_model_path = config['train']['catboost']['catboost_best_model_path']
+
+# Predict
+
+# Catboost
+catboost_metrics = config['predict']['catboost']['metrics']
+catboost_inference_predict = config['predict']['catboost']['inference_predict']

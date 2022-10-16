@@ -4,7 +4,7 @@ import logging
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
 from src.utils import save_as_pickle
-from src.data.preprocess import preprocess_data, preprocess_target, extract_target
+from src.data.preprocess import *
 import pandas as pd
 from src.config import *
 
@@ -21,10 +21,6 @@ def main():
 
     train = preprocess_data(train)
     test = preprocess_data(test)
-
-    train, target = extract_target(train)
-    target = preprocess_target(target)
-    save_as_pickle(target, preprocessed_target_data_pkl)
 
     save_as_pickle(train, preprocessed_train_data_pkl)
     save_as_pickle(test, preprocessed_test_data_pkl)
