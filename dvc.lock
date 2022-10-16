@@ -88,3 +88,45 @@ stages:
     - path: data/preprocessed/train_data.pkl
       md5: 6ca90dd6846e2d5c64980742742d1169
       size: 61306
+  generate_features:
+    cmd: python -m src.features.build_features --config=params.yaml
+    deps:
+    - path: data/preprocessed/target_data.pkl
+      md5: 0b4cbec5ca168ffbbfa7399b28d9e2d9
+      size: 21128
+    - path: data/preprocessed/test_data.pkl
+      md5: edeefe115658b8aa683ee2acb4b82d2a
+      size: 43142
+    - path: data/preprocessed/train_data.pkl
+      md5: 6ca90dd6846e2d5c64980742742d1169
+      size: 61306
+    - path: src/config.py
+      md5: c24bef906a454fb3986e43a6da9510d0
+      size: 1528
+    - path: src/features/build_features.py
+      md5: ce1e29916afdbf3144a9fb9cca680d3c
+      size: 1250
+    - path: src/features/features.py
+      md5: f9e49793825db16ccadb19e21d4c5ecb
+      size: 1150
+    - path: src/utils.py
+      md5: a63e9fc88f67423ded9b88dcd49a34f6
+      size: 375
+    params:
+      params.yaml:
+        generate_features:
+          cols:
+            WAKE_UP_TIME_COL: Время пробуждения
+            FALL_ASLEEP_COL: Время засыпания
+            SLEEP_BEHAVIORS_COL: Жаворонок/Сова
+            SLEEP_DURATION_COL: Длительность сна (ч.)
+          paths:
+            featurized_train_data_pkl: data/features/featurized_train_data_pkl
+            featurized_test_data_pkl: data/features/featurized_test_data_pkl
+    outs:
+    - path: data/features/featurized_test_data_pkl
+      md5: 52b8a9888e9f27b6b5be5327f66ca1e3
+      size: 71059
+    - path: data/features/featurized_train_data_pkl
+      md5: d509399459aaa45f9a4759ce973ebe31
+      size: 49432

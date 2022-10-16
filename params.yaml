@@ -32,5 +32,3 @@ generate_features:
     featurized_train_data_pkl: 'data/features/featurized_train_data_pkl'
     featurized_test_data_pkl: 'data/features/featurized_test_data_pkl'
 
-
-train:

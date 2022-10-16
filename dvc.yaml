@@ -15,3 +15,18 @@ stages:
     - data/preprocessed/target_data.pkl
     - data/preprocessed/test_data.pkl
     - data/preprocessed/train_data.pkl
+  generate_features:
+    cmd: python -m src.features.build_features --config=params.yaml
+    deps:
+    - data/preprocessed/target_data.pkl
+    - data/preprocessed/test_data.pkl
+    - data/preprocessed/train_data.pkl
+    - src/config.py
+    - src/features/build_features.py
+    - src/features/features.py
+    - src/utils.py
+    params:
+    - generate_features
+    outs:
+    - data/features/featurized_test_data_pkl
+    - data/features/featurized_train_data_pkl
