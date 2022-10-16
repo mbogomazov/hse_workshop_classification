@@ -63,7 +63,7 @@ def print_metrics(y_true, y_pred, average=None):
     print('accuracy', )
 
 
-def save_metrics_to_json(y_true, y_pred, file_name, average=None):
+def save_metrics_to_json(y_true, y_pred, file_name, average='micro'):
     metrics = {
         'precision': precision_score(y_true, y_pred, average=average).tolist(),
         'recall': recall_score(y_true, y_pred, average=average).tolist(),

@@ -136,8 +136,8 @@ stages:
       md5: 64eb42aa3c2110aa9dec82020e5aca3c
       size: 2093
     - path: src/models/utils.py
-      md5: 040d5f920076d2409a6ef5e92edb7104
-      size: 2944
+      md5: d67cec1ad47ceaeafc0792aa09c80a94
+      size: 2947
     params:
       params.yaml:
         train:
@@ -171,7 +171,7 @@ stages:
       md5: 61e94a5388383d8870d197a3d27b4ac4
       size: 88369
     - path: models/catboost_best_model.joblib
-      md5: b76bb923be5fd385aa01a7e02222afdf
+      md5: 1a527875b97a079c685e901396e96549
       size: 26753956
   pred_eval_catboost:
     cmd: python -m src.models.catboost.predict_model --config=params.yaml
@@ -183,7 +183,7 @@ stages:
       md5: 3ee7a6628f8a5885585f2260258a9951
       size: 109589
     - path: models/catboost_best_model.joblib
-      md5: b76bb923be5fd385aa01a7e02222afdf
+      md5: 1a527875b97a079c685e901396e96549
       size: 26753956
     - path: src/config.py
       md5: f7eab9f5f533667a1213170b7ee66140
@@ -195,8 +195,8 @@ stages:
       md5: 64eb42aa3c2110aa9dec82020e5aca3c
       size: 2093
     - path: src/models/utils.py
-      md5: 040d5f920076d2409a6ef5e92edb7104
-      size: 2944
+      md5: d67cec1ad47ceaeafc0792aa09c80a94
+      size: 2947
     params:
       params.yaml:
         predict:
@@ -211,8 +211,8 @@ stages:
       md5: 7421c3263861950b2d318da764a3647e
       size: 79750
     - path: reports/catboost_metrics.json
-      md5: 49bb3b76e0d16cffa481828df9a60ba4
-      size: 275
+      md5: 6819b5140b17bb82ca7cd36393d26670
+      size: 126
   train_hyperopt:
     cmd: python -m src.models.hyperopt.train_model --config=params.yaml
     deps:
@@ -232,8 +232,8 @@ stages:
       md5: a10338ea9377c7acf9cc7f42e301d6f1
       size: 1703
     - path: src/models/utils.py
-      md5: 040d5f920076d2409a6ef5e92edb7104
-      size: 2944
+      md5: d67cec1ad47ceaeafc0792aa09c80a94
+      size: 2947
     params:
       params.yaml:
         train:
@@ -264,8 +264,8 @@ stages:
             catboost_best_model_path: models/catboost_best_model.joblib
     outs:
     - path: models/hyperopt_best_model.joblib
-      md5: 34d561d208b86420648ef8695d692575
-      size: 951313
+      md5: 8b043562a04e3b14d8eaf0fb3ba0232a
+      size: 2603633
   pred_eval_hyperopt:
     cmd: python -m src.models.hyperopt.predict_model --config=params.yaml
     deps:
@@ -276,8 +276,8 @@ stages:
       md5: 3ee7a6628f8a5885585f2260258a9951
       size: 109589
     - path: models/hyperopt_best_model.joblib
-      md5: 34d561d208b86420648ef8695d692575
-      size: 951313
+      md5: 8b043562a04e3b14d8eaf0fb3ba0232a
+      size: 2603633
     - path: src/config.py
       md5: f7eab9f5f533667a1213170b7ee66140
       size: 2808
@@ -288,8 +288,8 @@ stages:
       md5: a10338ea9377c7acf9cc7f42e301d6f1
       size: 1703
     - path: src/models/utils.py
-      md5: 040d5f920076d2409a6ef5e92edb7104
-      size: 2944
+      md5: d67cec1ad47ceaeafc0792aa09c80a94
+      size: 2947
     params:
       params.yaml:
         predict:
@@ -301,8 +301,8 @@ stages:
             inference_predict: data/inference/catboost_predict.csv
     outs:
     - path: data/inference/hyperopt_predict.csv
-      md5: 1bf7b83bf084a2015a2011bfbbaae115
+      md5: 72092f11b2df116a3b5eb6a5645c9ce3
       size: 79750
     - path: reports/hyperopt_metrics.json
-      md5: 37a0d9e8176f9e238275fa8576aaebdc
-      size: 239
+      md5: 3e36e811e64448f20b395bdab4742bb1
+      size: 129
