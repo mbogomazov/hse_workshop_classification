@@ -1,0 +1,62 @@
+base:
+  seed: 42
+
+load_data:
+  data_train_path: data/raw/train.csv
+  data_test_path: data/raw/test.csv
+
+preprocess_data:
+  cols:
+    TARGET_COLS: ['Артериальная гипертензия', 'ОНМК', 'Стенокардия, ИБС, инфаркт миокарда', 'Сердечная недостаточность', 'Прочие заболевания сердца']
+    ID_COL: 'ID'
+    EDU_COL: 'Образование'
+    SEX_COL: 'Пол'
+    FREQ_COL: 'Частота пасс кур'
+    CAT_COLS: [ 'Пол', 'Семья', 'Этнос', 'Национальность', 'Религия', 'Образование', 'Профессия', 'Статус Курения', 'Частота пасс кур', 'Алкоголь', 'Время засыпания', 'Время пробуждения']
+    OHE_COLS: [ 'Вы работаете?', 'Выход на пенсию', 'Прекращение работы по болезни', 'Сахарный диабет', 'Гепатит', 'Онкология', 'Хроническое заболевание легких', 'Бронжиальная астма', 'Туберкулез легких ', 'ВИЧ/СПИД', 'Регулярный прим лекарственных средств', 'Травмы за год', 'Переломы','Пассивное курение', 'Сон после обеда', 'Спорт, клубы', 'Религия, клубы']
+    REAL_COLS: ['Возраст курения', 'Сигарет в день', 'Возраст алког']
+
+  paths:
+    preprocessed_train_data_pkl: data/preprocessed/train_data.pkl 
+    preprocessed_target_data_pkl: data/preprocessed/target_data.pkl
+    preprocessed_test_data_pkl: data/preprocessed/test_data.pkl
+
+generate_features:
+  cols:
+    WAKE_UP_TIME_COL: 'Время пробуждения'
+    FALL_ASLEEP_COL: 'Время засыпания'
+    SLEEP_BEHAVIORS_COL: 'Жаворонок/Сова/Воробей'
+    SLEEP_DURATION_COL: 'Длительность сна (ч.)'
+
+  paths:
+    featurized_train_data_pkl: 'data/features/featurized_train_data_pkl'
+    featurized_test_data_pkl: 'data/features/featurized_test_data_pkl'
+
+
+train:
+  CAT_COLS: [ 'Пол', 'Семья', 'Этнос', 'Национальность', 'Религия', 'Образование', 'Профессия', 'Статус Курения', 'Частота пасс кур', 'Алкоголь', 'Жаворонок/Сова/Воробей']
+
+  hyperopt:
+    best_model_file: 'models/hyperopt_best_model.joblib'
+
+  catboost:
+    iterations: 5000
+    loss_function: 'MultiLogloss'
+    eval_metric: 'MultiLogloss'
+    learning_rate: 0.03
+    bootstrap_type: 'Bayesian'
+    boost_from_average: False
+    ctr_leaf_count_limit: 1
+    leaf_estimation_iterations: 1
+    leaf_estimation_method: 'Gradient'
+    catboost_best_model_path: 'models/catboost_best_model.joblib'
+
+predict:
+
+  hyperopt:
+    metrics: 'reports/hyperopt_metrics.json'
+    inference_predict: 'data/inference/hyperopt_predict.csv'
+
+  catboost:
+    metrics: 'reports/catboost_metrics.json'
+    inference_predict: 'data/inference/catboost_predict.csv'
