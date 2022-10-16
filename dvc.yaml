@@ -1,0 +1,17 @@
+stages:
+  load_data:
+    cmd: python -m src.data.make_dataset --config=params.yaml
+    deps:
+    - data/raw/test.csv
+    - data/raw/train.csv
+    - src/config.py
+    - src/data/make_dataset.py
+    - src/data/preprocess.py
+    - src/utils.py
+    params:
+    - load_data
+    - preprocess_data
+    outs:
+    - data/preprocessed/target_data.pkl
+    - data/preprocessed/test_data.pkl
+    - data/preprocessed/train_data.pkl

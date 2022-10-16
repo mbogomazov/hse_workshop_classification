@@ -1,0 +1,90 @@
+schema: '2.0'
+stages:
+  load_data:
+    cmd: python -m src.data.make_dataset --config=params.yaml
+    deps:
+    - path: data/raw/test.csv
+      md5: f4088e849b8f561eb3e9055a4251567a
+      size: 248941
+    - path: data/raw/train.csv
+      md5: 3fe5dc9c07027b120ea0ff061018594d
+      size: 399312
+    - path: src/config.py
+      md5: c24bef906a454fb3986e43a6da9510d0
+      size: 1528
+    - path: src/data/make_dataset.py
+      md5: 12e8d2ead4dd960163983642455ab2c0
+      size: 1393
+    - path: src/data/preprocess.py
+      md5: ff632622b7d61d5074a2ed5ac50f74d2
+      size: 1764
+    - path: src/utils.py
+      md5: a63e9fc88f67423ded9b88dcd49a34f6
+      size: 375
+    params:
+      params.yaml:
+        load_data:
+          data_train_path: data/raw/train.csv
+          data_test_path: data/raw/test.csv
+        preprocess_data:
+          cols:
+            TARGET_COLS:
+            - Артериальная гипертензия
+            - ОНМК
+            - Стенокардия, ИБС, инфаркт миокарда
+            - Сердечная недостаточность
+            - Прочие заболевания сердца
+            ID_COL: ID
+            EDU_COL: Образование
+            SEX_COL: Пол
+            FREQ_COL: Частота пасс кур
+            CAT_COLS:
+            - Пол
+            - Семья
+            - Этнос
+            - Национальность
+            - Религия
+            - Образование
+            - Профессия
+            - Статус Курения
+            - Частота пасс кур
+            - Алкоголь
+            - Время засыпания
+            - Время пробуждения
+            OHE_COLS:
+            - Пол
+            - Вы работаете?
+            - Выход на пенсию
+            - Прекращение работы по болезни
+            - Сахарный диабет
+            - Гепатит
+            - Онкология
+            - Хроническое заболевание легких
+            - Бронжиальная астма
+            - 'Туберкулез легких '
+            - ВИЧ/СПИД
+            - Регулярный прим лекарственных средств
+            - Травмы за год
+            - Переломы
+            - Пассивное курение
+            - Сон после обеда
+            - Спорт, клубы
+            - Религия, клубы
+            REAL_COLS:
+            - Возраст курения
+            - Сигарет в день
+            - Возраст алког
+          paths:
+            preprocessed_train_data_pkl: data/preprocessed/train_data.pkl
+            preprocessed_target_data_pkl: data/preprocessed/target_data.pkl
+            preprocessed_test_data_pkl: data/preprocessed/test_data.pkl
+    outs:
+    - path: data/preprocessed/target_data.pkl
+      md5: 0b4cbec5ca168ffbbfa7399b28d9e2d9
+      size: 21128
+    - path: data/preprocessed/test_data.pkl
+      md5: edeefe115658b8aa683ee2acb4b82d2a
+      size: 43142
+    - path: data/preprocessed/train_data.pkl
+      md5: 6ca90dd6846e2d5c64980742742d1169
+      size: 61306
