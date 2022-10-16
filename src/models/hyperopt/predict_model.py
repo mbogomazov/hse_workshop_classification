@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-import click
+import joblib
+import pandas as pd
+import numpy as np
 import logging
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
-from src.features.features import gen_features
-from src.utils import save_as_pickle
 from src.config import *
-import pandas as pd
+from src.models.utils import extract_target, gen_split_data, save_metrics_to_json
 
 
 def main():
@@ -14,16 +14,25 @@ def main():
         cleaned data ready to be analyzed (saved in ../processed).
     """
     logger = logging.getLogger(__name__)
-    logger.info('Generate features')
+    logger.info('Predict & eval best model from Hyperopt')
 
-    train = pd.read_pickle(preprocessed_train_data_pkl)
-    test = pd.read_pickle(preprocessed_test_data_pkl)
+    model = joblib.load(hyperopt_best_model_file)
 
-    train = gen_features(train)
-    test = gen_features(test)
+    train = pd.read_pickle(featurized_train_data_pkl)
 
-    save_as_pickle(train, featurized_train_data_pkl)
-    save_as_pickle(test, featurized_test_data_pkl)
+    train, target = extract_target(train)
+
+    train_data, val_data, train_target, val_target = gen_split_data(
+        train, target)
+
+    y_predict = model.predict(val_data)
+
+    save_metrics_to_json(val_target, y_predict, hyperopt_metrics)
+
+    test = pd.read_pickle(featurized_test_data_pkl)
+
+    inference_predict = model.predict(test)
+    np.savetxt(hyperopt_inference_predict, inference_predict, delimiter=",")
 
 
 if __name__ == '__main__':

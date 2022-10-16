@@ -39,6 +39,8 @@ stages:
     - train
     outs:
     - models/catboost_best_model.joblib
+    plots:
+    - catboost_info/learn_error.tsv
   pred_eval_catboost:
     cmd: python -m src.models.catboost.predict_model --config=params.yaml
     deps:
@@ -55,3 +57,32 @@ stages:
     - data/inference/catboost_predict.csv
     metrics:
     - reports/catboost_metrics.json
+  train_hyperopt:
+    cmd: python -m src.models.hyperopt.train_model --config=params.yaml
+    deps:
+    - data/features/featurized_train_data_pkl
+    - src/config.py
+    - src/models/hyperopt/find_best_model.py
+    - src/models/hyperopt/pipelines.py
+    - src/models/hyperopt/train_model.py
+    - src/models/utils.py
+    params:
+    - train
+    outs:
+    - models/hyperopt_best_model.joblib
+  pred_eval_hyperopt:
+    cmd: python -m src.models.hyperopt.predict_model --config=params.yaml
+    deps:
+    - data/features/featurized_test_data_pkl
+    - data/features/featurized_train_data_pkl
+    - models/hyperopt_best_model.joblib
+    - src/config.py
+    - src/models/hyperopt/predict_model.py
+    - src/models/hyperopt/train_model.py
+    - src/models/utils.py
+    params:
+    - predict
+    outs:
+    - data/inference/hyperopt_predict.csv
+    metrics:
+    - reports/hyperopt_metrics.json

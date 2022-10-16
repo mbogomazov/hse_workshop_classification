@@ -14,7 +14,7 @@ def main():
         cleaned data ready to be analyzed (saved in ../processed).
     """
     logger = logging.getLogger(__name__)
-    logger.info('making final data set from raw data')
+    logger.info('Preprocess dataset')
 
     train = pd.read_csv(train_csv)
     test = pd.read_csv(test_csv)

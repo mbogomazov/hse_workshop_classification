@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
 import joblib
-import pandas as pd
-import numpy as np
 import logging
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
+import pandas as pd
 from src.config import *
-from src.models.utils import extract_target, gen_split_data, save_metrics_to_json
+from src.models.utils import extract_target
+from sklearn.pipeline import *
+from src.models.hyperopt.pipelines import *
+from src.models.hyperopt.find_best_model import *
+from src.models.utils import *
+from sklearn.multioutput import MultiOutputClassifier
 
 
 def main():
@@ -14,9 +18,7 @@ def main():
         cleaned data ready to be analyzed (saved in ../processed).
     """
     logger = logging.getLogger(__name__)
-    logger.info('Predict & eval Catboost model')
-
-    model = joblib.load(catboost_best_model_path)
+    logger.info('Use Hyperopt to find best model and train it')
 
     train = pd.read_pickle(featurized_train_data_pkl)
 
@@ -25,14 +27,16 @@ def main():
     train_data, val_data, train_target, val_target = gen_split_data(
         train, target)
 
-    y_predict = model.predict(val_data)
+    model = find_best_model_by_hyperopt(train_data, train_target)
 
-    save_metrics_to_json(val_target, y_predict, catboost_metrics)
+    model_pipe = Pipeline([
+        ('preprocess', preprocess_pipe),
+        ('model', model)
+    ])
 
-    test = pd.read_pickle(featurized_test_data_pkl)
-
-    inference_predict = model.predict(test)
-    np.savetxt(catboost_inference_predict, inference_predict, delimiter=",")
+    multiout_model_pipe = MultiOutputClassifier(model_pipe, n_jobs=4)
+    best_model = multiout_model_pipe.fit(train_data, train_target)
+    joblib.dump(best_model, hyperopt_best_model_file)
 
 
 if __name__ == '__main__':

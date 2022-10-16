@@ -3,6 +3,9 @@ import yaml
 with open('params.yaml') as conf_file:
     config = yaml.safe_load(conf_file)
 
+# Base
+seed = config['base']['seed']
+
 # Data load paths
 train_csv = config['load_data']['data_train_path']
 test_csv = config['load_data']['data_test_path']
@@ -52,6 +55,10 @@ catboost_leaf_estimation_method = config['train']['catboost']['leaf_estimation_m
 catboost_best_model_path = config['train']['catboost']['catboost_best_model_path']
 
 # Predict
+
+# Hyperopt
+hyperopt_metrics = config['predict']['hyperopt']['metrics']
+hyperopt_inference_predict = config['predict']['hyperopt']['inference_predict']
 
 # Catboost
 catboost_metrics = config['predict']['catboost']['metrics']
