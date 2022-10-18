@@ -74,23 +74,23 @@ stages:
             - Сигарет в день
             - Возраст алког
           paths:
-            preprocessed_train_data_pkl: data/preprocessed/train_data.pkl
-            preprocessed_target_data_pkl: data/preprocessed/target_data.pkl
-            preprocessed_test_data_pkl: data/preprocessed/test_data.pkl
+            preprocessed_train_data_pkl: data/interim/train_data.pkl
+            preprocessed_target_data_pkl: data/interim/target_data.pkl
+            preprocessed_test_data_pkl: data/interim/test_data.pkl
     outs:
-    - path: data/preprocessed/test_data.pkl
+    - path: data/interim/test_data.pkl
       md5: edeefe115658b8aa683ee2acb4b82d2a
       size: 43142
-    - path: data/preprocessed/train_data.pkl
+    - path: data/interim/train_data.pkl
       md5: 8e9f23906108618d7b9f95323ba6ae33
       size: 99796
   generate_features:
     cmd: python -m src.features.build_features --config=params.yaml
     deps:
-    - path: data/preprocessed/test_data.pkl
+    - path: data/interim/test_data.pkl
       md5: edeefe115658b8aa683ee2acb4b82d2a
       size: 43142
-    - path: data/preprocessed/train_data.pkl
+    - path: data/interim/train_data.pkl
       md5: 8e9f23906108618d7b9f95323ba6ae33
       size: 99796
     - path: src/config.py
@@ -114,19 +114,19 @@ stages:
             SLEEP_BEHAVIORS_COL: Жаворонок/Сова/Воробей
             SLEEP_DURATION_COL: Длительность сна (ч.)
           paths:
-            featurized_train_data_pkl: data/features/featurized_train_data_pkl
-            featurized_test_data_pkl: data/features/featurized_test_data_pkl
+            featurized_train_data_pkl: data/interim/featurized_train_data_pkl
+            featurized_test_data_pkl: data/interim/featurized_test_data_pkl
     outs:
-    - path: data/features/featurized_test_data_pkl
+    - path: data/interim/featurized_test_data_pkl
       md5: fdf588f669a46f17dff05cf6eb7e9b1b
       size: 49447
-    - path: data/features/featurized_train_data_pkl
+    - path: data/interim/featurized_train_data_pkl
       md5: 3ee7a6628f8a5885585f2260258a9951
       size: 109589
   train_catboost:
     cmd: python -m src.models.catboost.train_model --config=params.yaml
     deps:
-    - path: data/features/featurized_train_data_pkl
+    - path: data/interim/featurized_train_data_pkl
       md5: 3ee7a6628f8a5885585f2260258a9951
       size: 109589
     - path: src/config.py
@@ -136,8 +136,8 @@ stages:
       md5: 64eb42aa3c2110aa9dec82020e5aca3c
       size: 2093
     - path: src/models/utils.py
-      md5: d67cec1ad47ceaeafc0792aa09c80a94
-      size: 2947
+      md5: 21db3c423470fb2f150bd23e43a30c2b
+      size: 1950
     params:
       params.yaml:
         train:
@@ -156,10 +156,10 @@ stages:
           hyperopt:
             best_model_file: models/hyperopt_best_model.joblib
           catboost:
-            iterations: 5000
+            iterations: 250
             loss_function: MultiLogloss
             eval_metric: MultiLogloss
-            learning_rate: 0.03
+            learning_rate: 0.01
             bootstrap_type: Bayesian
             boost_from_average: false
             ctr_leaf_count_limit: 1
@@ -168,55 +168,58 @@ stages:
             catboost_best_model_path: models/catboost_best_model.joblib
     outs:
     - path: catboost_info/learn_error.tsv
-      md5: 61e94a5388383d8870d197a3d27b4ac4
-      size: 88369
+      md5: 27537dfa9ed938f959ea409b9cd35f2b
+      size: 4130
     - path: models/catboost_best_model.joblib
-      md5: 1a527875b97a079c685e901396e96549
-      size: 26753956
+      md5: 35acce2ceeb6b79b36c9098028b63b2e
+      size: 1040740
   pred_eval_catboost:
     cmd: python -m src.models.catboost.predict_model --config=params.yaml
     deps:
-    - path: data/features/featurized_test_data_pkl
+    - path: data/interim/featurized_test_data_pkl
       md5: fdf588f669a46f17dff05cf6eb7e9b1b
       size: 49447
-    - path: data/features/featurized_train_data_pkl
+    - path: data/interim/featurized_train_data_pkl
       md5: 3ee7a6628f8a5885585f2260258a9951
       size: 109589
     - path: models/catboost_best_model.joblib
-      md5: 1a527875b97a079c685e901396e96549
-      size: 26753956
+      md5: 35acce2ceeb6b79b36c9098028b63b2e
+      size: 1040740
     - path: src/config.py
       md5: f7eab9f5f533667a1213170b7ee66140
       size: 2808
     - path: src/models/catboost/predict_model.py
-      md5: 069ca7881b4c3bffe4537265ba8be750
-      size: 1508
+      md5: a884df084055de6ec8a4231e07bc1df1
+      size: 1638
     - path: src/models/catboost/train_model.py
       md5: 64eb42aa3c2110aa9dec82020e5aca3c
       size: 2093
+    - path: src/models/predict_utils.py
+      md5: ef6a906de2fff4d672ad5e77d0f5380f
+      size: 804
     - path: src/models/utils.py
-      md5: d67cec1ad47ceaeafc0792aa09c80a94
-      size: 2947
+      md5: 21db3c423470fb2f150bd23e43a30c2b
+      size: 1950
     params:
       params.yaml:
         predict:
           hyperopt:
             metrics: reports/hyperopt_metrics.json
-            inference_predict: data/inference/hyperopt_predict.csv
+            inference_predict: data/processed/hyperopt_predict.csv
           catboost:
             metrics: reports/catboost_metrics.json
-            inference_predict: data/inference/catboost_predict.csv
+            inference_predict: data/processed/catboost_predict.csv
     outs:
-    - path: data/inference/catboost_predict.csv
-      md5: 7421c3263861950b2d318da764a3647e
+    - path: data/processed/catboost_predict.csv
+      md5: 7fb0d32cf344c5debd1162551dfe6d71
       size: 79750
     - path: reports/catboost_metrics.json
-      md5: 6819b5140b17bb82ca7cd36393d26670
-      size: 126
+      md5: 2c3e673e5c2daa9bc6708aac3eecc60a
+      size: 227
   train_hyperopt:
     cmd: python -m src.models.hyperopt.train_model --config=params.yaml
     deps:
-    - path: data/features/featurized_train_data_pkl
+    - path: data/interim/featurized_train_data_pkl
       md5: 3ee7a6628f8a5885585f2260258a9951
       size: 109589
     - path: src/config.py
@@ -229,11 +232,11 @@ stages:
       md5: b7ae575ce0c2a26f3f2967ffb48cca90
       size: 457
     - path: src/models/hyperopt/train_model.py
-      md5: a10338ea9377c7acf9cc7f42e301d6f1
-      size: 1703
+      md5: 8d68eaa8300c267734421341639b5556
+      size: 1746
     - path: src/models/utils.py
-      md5: d67cec1ad47ceaeafc0792aa09c80a94
-      size: 2947
+      md5: 21db3c423470fb2f150bd23e43a30c2b
+      size: 1950
     params:
       params.yaml:
         train:
@@ -252,10 +255,10 @@ stages:
           hyperopt:
             best_model_file: models/hyperopt_best_model.joblib
           catboost:
-            iterations: 5000
+            iterations: 250
             loss_function: MultiLogloss
             eval_metric: MultiLogloss
-            learning_rate: 0.03
+            learning_rate: 0.01
             bootstrap_type: Bayesian
             boost_from_average: false
             ctr_leaf_count_limit: 1
@@ -264,45 +267,48 @@ stages:
             catboost_best_model_path: models/catboost_best_model.joblib
     outs:
     - path: models/hyperopt_best_model.joblib
-      md5: 8b043562a04e3b14d8eaf0fb3ba0232a
-      size: 2603633
+      md5: c459ac140d02aa563324d6d0092f76bd
+      size: 8749488
   pred_eval_hyperopt:
     cmd: python -m src.models.hyperopt.predict_model --config=params.yaml
     deps:
-    - path: data/features/featurized_test_data_pkl
+    - path: data/interim/featurized_test_data_pkl
       md5: fdf588f669a46f17dff05cf6eb7e9b1b
       size: 49447
-    - path: data/features/featurized_train_data_pkl
+    - path: data/interim/featurized_train_data_pkl
       md5: 3ee7a6628f8a5885585f2260258a9951
       size: 109589
     - path: models/hyperopt_best_model.joblib
-      md5: 8b043562a04e3b14d8eaf0fb3ba0232a
-      size: 2603633
+      md5: c459ac140d02aa563324d6d0092f76bd
+      size: 8749488
     - path: src/config.py
       md5: f7eab9f5f533667a1213170b7ee66140
       size: 2808
     - path: src/models/hyperopt/predict_model.py
-      md5: cce4071d97c591e7a982c25740cf8b62
-      size: 1518
+      md5: bf9ac09c18631fc56be0918557350c66
+      size: 1648
     - path: src/models/hyperopt/train_model.py
-      md5: a10338ea9377c7acf9cc7f42e301d6f1
-      size: 1703
+      md5: 8d68eaa8300c267734421341639b5556
+      size: 1746
+    - path: src/models/predict_utils.py
+      md5: ef6a906de2fff4d672ad5e77d0f5380f
+      size: 804
     - path: src/models/utils.py
-      md5: d67cec1ad47ceaeafc0792aa09c80a94
-      size: 2947
+      md5: 21db3c423470fb2f150bd23e43a30c2b
+      size: 1950
     params:
       params.yaml:
         predict:
           hyperopt:
             metrics: reports/hyperopt_metrics.json
-            inference_predict: data/inference/hyperopt_predict.csv
+            inference_predict: data/processed/hyperopt_predict.csv
           catboost:
             metrics: reports/catboost_metrics.json
-            inference_predict: data/inference/catboost_predict.csv
+            inference_predict: data/processed/catboost_predict.csv
     outs:
-    - path: data/inference/hyperopt_predict.csv
-      md5: 72092f11b2df116a3b5eb6a5645c9ce3
+    - path: data/processed/hyperopt_predict.csv
+      md5: f826c2556c1f27aac42a20409daf1c6e
       size: 79750
     - path: reports/hyperopt_metrics.json
-      md5: 3e36e811e64448f20b395bdab4742bb1
-      size: 129
+      md5: cef2fbe4d7e01138a3f66b0b6c147895
+      size: 232
