@@ -34,8 +34,10 @@ def main():
         ('model', model)
     ])
 
-    multiout_model_pipe = MultiOutputClassifier(model_pipe, n_jobs=4)
+    multiout_model_pipe = MultiOutputClassifier(
+        model_pipe, n_jobs=4)
     best_model = multiout_model_pipe.fit(train_data, train_target)
+    best_model.probability = True
     joblib.dump(best_model, hyperopt_best_model_file)
 
 

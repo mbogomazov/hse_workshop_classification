@@ -6,7 +6,8 @@ import logging
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
 from src.config import *
-from src.models.utils import extract_target, gen_split_data, save_metrics_to_json
+from src.models.utils import extract_target, gen_split_data
+from src.models.predict_utils import save_metrics_to_json
 
 
 def main():
@@ -26,8 +27,10 @@ def main():
         train, target)
 
     y_predict = model.predict(val_data)
+    y_predict_proba = model.predict_proba(val_data)
 
-    save_metrics_to_json(val_target, y_predict, catboost_metrics)
+    save_metrics_to_json(val_target, y_predict,
+                         y_predict_proba, catboost_metrics)
 
     test = pd.read_pickle(featurized_test_data_pkl)
 

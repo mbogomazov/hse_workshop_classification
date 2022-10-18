@@ -12,13 +12,13 @@ stages:
     - load_data
     - preprocess_data
     outs:
-    - data/preprocessed/test_data.pkl
-    - data/preprocessed/train_data.pkl
+    - data/interim/test_data.pkl
+    - data/interim/train_data.pkl
   generate_features:
     cmd: python -m src.features.build_features --config=params.yaml
     deps:
-    - data/preprocessed/test_data.pkl
-    - data/preprocessed/train_data.pkl
+    - data/interim/test_data.pkl
+    - data/interim/train_data.pkl
     - src/config.py
     - src/features/build_features.py
     - src/features/features.py
@@ -26,12 +26,12 @@ stages:
     params:
     - generate_features
     outs:
-    - data/features/featurized_test_data_pkl
-    - data/features/featurized_train_data_pkl
+    - data/interim/featurized_test_data_pkl
+    - data/interim/featurized_train_data_pkl
   train_catboost:
     cmd: python -m src.models.catboost.train_model --config=params.yaml
     deps:
-    - data/features/featurized_train_data_pkl
+    - data/interim/featurized_train_data_pkl
     - src/config.py
     - src/models/catboost/train_model.py
     - src/models/utils.py
@@ -44,23 +44,24 @@ stages:
   pred_eval_catboost:
     cmd: python -m src.models.catboost.predict_model --config=params.yaml
     deps:
-    - data/features/featurized_test_data_pkl
-    - data/features/featurized_train_data_pkl
+    - data/interim/featurized_test_data_pkl
+    - data/interim/featurized_train_data_pkl
     - models/catboost_best_model.joblib
     - src/config.py
     - src/models/catboost/predict_model.py
     - src/models/catboost/train_model.py
     - src/models/utils.py
+    - src/models/predict_utils.py
     params:
     - predict
     outs:
-    - data/inference/catboost_predict.csv
+    - data/processed/catboost_predict.csv
     metrics:
     - reports/catboost_metrics.json
   train_hyperopt:
     cmd: python -m src.models.hyperopt.train_model --config=params.yaml
     deps:
-    - data/features/featurized_train_data_pkl
+    - data/interim/featurized_train_data_pkl
     - src/config.py
     - src/models/hyperopt/find_best_model.py
     - src/models/hyperopt/pipelines.py
@@ -73,16 +74,17 @@ stages:
   pred_eval_hyperopt:
     cmd: python -m src.models.hyperopt.predict_model --config=params.yaml
     deps:
-    - data/features/featurized_test_data_pkl
-    - data/features/featurized_train_data_pkl
+    - data/interim/featurized_test_data_pkl
+    - data/interim/featurized_train_data_pkl
     - models/hyperopt_best_model.joblib
     - src/config.py
     - src/models/hyperopt/predict_model.py
     - src/models/hyperopt/train_model.py
     - src/models/utils.py
+    - src/models/predict_utils.py
     params:
     - predict
     outs:
-    - data/inference/hyperopt_predict.csv
+    - data/processed/hyperopt_predict.csv
     metrics:
     - reports/hyperopt_metrics.json

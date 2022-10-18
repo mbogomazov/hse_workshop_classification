@@ -1,6 +1,5 @@
 import pandas as pd
 from iterstrat.ml_stratifiers import MultilabelStratifiedShuffleSplit
-from hyperopt import tpe
 from src.models.hyperopt.pipelines import *
 from sklearn.utils import indexable, _safe_indexing
 from sklearn.utils.validation import _num_samples
@@ -8,8 +7,6 @@ from sklearn.model_selection._split import _validate_shuffle_split
 from sklearn.model_selection import *
 from itertools import chain
 from src.config import *
-from sklearn.metrics import *
-import json
 
 
 def extract_target(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -52,30 +49,3 @@ def multilabel_train_test_split(*arrays,
 def gen_split_data(train, target):
     return multilabel_train_test_split(
         train, target, stratify=target, train_size=0.9)
-
-
-def print_metrics(y_true, y_pred, average=None):
-    print('precision ', precision_score(y_true, y_pred, average=average))
-    print('recall ', recall_score(y_true, y_pred, average=average))
-    print('f1 ', f1_score(y_true, y_pred, average=average))
-
-    print('roc auc', roc_auc_score(y_true, y_pred, average=average))
-    print('accuracy', )
-
-
-def save_metrics_to_json(y_true, y_pred, file_name, average='micro'):
-    metrics = {
-        'precision': precision_score(y_true, y_pred, average=average).tolist(),
-        'recall': recall_score(y_true, y_pred, average=average).tolist(),
-        'f1': f1_score(y_true, y_pred, average=average).tolist(),
-        'accuracy': accuracy_score(y_true, y_pred)
-    }
-
-    if average == 'samples':
-        average = None
-
-    metrics['roc_auc'] = roc_auc_score(
-        y_true, y_pred, average=average).tolist()
-
-    with open(file_name, 'w') as f:
-        f.write(json.dumps(metrics))
